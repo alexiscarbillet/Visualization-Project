@@ -69,7 +69,7 @@ library(plotly)
 data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv", header=TRUE, sep=";")
 
 a<-as.matrix(data[,2:29]) # on fait de notre sous dataset data[,2:29] une matrice, la première colonne sera utilisée pour l'axe des ordonnées
-#basic heatmap
+#on trace heatmap avec en abscisse les pays et en ordonnées les dates de mesure des réserves d'or des différents pays
 plot_ly(x=names(data[2:29]), y=data[,1],z = a, type = "heatmap")
 # on ne peut pas mettre de label ou de titre en utilsant plot_ly d'où le fait qu'il n'y en ait pas
 # le fait de vouloir les mettre en annotation ne fonctionne pas non plus (ils ne sont pas aux endroits souhaités)
