@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 La presse décrit souvent l'endettement des pays, donnant une vision pessimiste des situations économiques des pays, notamment en Europe. La montée en puissance des pays émergents, tant sur le plan politique qu'économique renforce ce sentiment d'impuissance chez les populations européennes. Il nous a semblé judicieux d'étudier l'évolution des réserves d'or de ces pays plutôt que leurs endettements afin d'avoir un champ d'étude différent de ce que les journeaux font habituellement.
 Dans notre étude, nous avons utiliser une base de donnée qui se trouve en suivant ce lien:<https://www.data.gouv.fr/fr/datasets/reserves-officielles-de-28-pays-europeens/>. Il s'agit d'un excel contenant une colonne principale pour chaque pays de l'union européenne. Chaque colonne principale est constituée de 4 sous colonnes. La première correpond aux réserves d'or en tonnes, la seconde sa conversion en millions de dollards américain,la troisième sa réserve de change en millions de dollards américain et la dernière le total des deux dernières colonnes.
 <br>
+Par la suite, on traitera un dataset simplifié qui ne gardera que la permière sous colonne de chaque pays, c'est-à-dire sa réserve d'or en tonnes. Il se trouve sous format csv au nom de european-reserves-by-country-simplify.csv au lien suivant: <https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv>
+<br>
 
 # Choix des graphiques
 <br>
@@ -22,14 +24,22 @@ La base de données contient différentes séries temporelles. D'après le site 
 Nous avons choisi de traiter les deux graphiques suivants: lineplot et heatmap. De cette façon nous avons deux catégories de graphiques différentes car le lineplot appartenant à aux graphiques d'évolution et le heatmap à ceux de corrélation.
 <br>
 
+# Caractéristiques du dataset simplifié
+<br>
+```{r}
+# importation les données
+data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv", header=TRUE, sep=";")
+# traitement des données
+summary(data[2:29]) #la première colonne correspond aux dates donc on a pas besoin de les traiter dans ce cas
+```
+Cela nous permet de connaitre la moyenne, élément manquant dans le graphique boxplot. Le reste des informations se retrouvent dans ce graphique. Cependant, cela ne nous permet pas de connaitre les valeurs de chaque données d'où le besoin de tracer les nuages de points sur le graphique suivant.
+<br>
 # Code du graphique boxplot
 ```{r,warning=FALSE,message=FALSE,fig.align='center',fig.height=15,fig.width=9}
-
+# import des libraries
 library(ggplot2)
 library(plotly)
-# ouverture du fichier Excel et importation des données
-# nettoyage des données faite au préalable
-# on ne s'intéresse ici qu'aux réserves en tonnes d'or, les autres sous-colonnes ont été supprimées
+# ouverture du fichier csv et importation des données
 data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv", header=TRUE, sep=";")
 # on met les noms en ligne, chaque valeur de réserve en or doit avoir un nom associé qui est celui de son pays
 nom=sort(rep(names(data)[2:29],57)) 
@@ -40,10 +50,10 @@ for(i in seq(2,29))
   for(j in seq(1,57))
     value[((i-2)*57+j)]=data[j,i]
 data2=data.frame(nom,value) # on créé le nouveau datatset à partir de nom et value
-# plot
+# on plot le graphique
 p<-qplot(x=nom , y=value , data=data2, main="boxplot des réserves d'or en tonnes selon les pays de l'UE", xlab="Nom du pays", ylab="quantité d'or en tonnes",geom=c("boxplot","jitter"))+
   coord_flip() # échange les axes
-ggplotly(p)
+ggplotly(p) # le graphique devient interactif
 ```
 
 # Description des résultats du graphique heatmap
@@ -55,9 +65,7 @@ Ces 21 pays représentent 75% des pays de l'union européenne. Peut-on considér
 # Code du graphique heatmap
 ```{r,warning=FALSE,message=FALSE,fig.align='center',fig.height=5,fig.width=9}
 library(plotly)
-# ouverture du fichier Excel et importation des données
-# nettoyage des données au préalable
-# on ne s'intéresse ici qu'aux réserves en tonnes d'or, les autres sous-colonnes ont été supprimé
+# ouverture du fichier csv et importation des données
 data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv", header=TRUE, sep=";")
 
 a<-as.matrix(data[,2:29]) # on fait de notre sous dataset data[,2:29] une matrice, la première colonne sera utilisée pour l'axe des ordonnées
