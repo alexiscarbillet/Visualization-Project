@@ -30,11 +30,12 @@ library(plotly)
 ## Base de données
 Dans notre étude, nous avons utilisé une base de données qui se trouve sur [le site data.gouv.fr](https://www.data.gouv.fr/fr/datasets/reserves-officielles-de-28-pays-europeens). Cette base de données représente les réserves d'or de 28 pays européens au cours du temps (du 31 mars 2000 jusqu'au 31 mars 2014) regroupés dans un tableur Excel. Sous chaque pays, se déclinent 4 sous-colonnes : la première correspond aux réserves d'or en tonnes, la seconde colonne la conversion de ces réserves en millions de dollars américains, la troisième sa réserve de change en millions de dollars américains et la dernière le total en dollars américains des deux dernières colonnes.
 <br>
-Par la suite, on traitera un dataset simplifié qui ne gardera que la permière sous-colonne de chaque pays, c'est-à-dire sa réserve d'or en tonnes. Il se trouve sous format csv au nom de european-reserves-by-country-simplified.csv au [lien suivant](https://raw.githubusercontent.com/estherjamet/Visualization-Project/master/european-reserves-by-country-simplified.csv).
+Par la suite, on traitera un dataset simplifié qui ne gardera que la permière sous-colonne de chaque pays, c'est-à-dire sa réserve d'or en tonnes. Il se trouve sous format csv au nom de european-reserves-by-country-simplified.csv au [lien suivant](https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv).
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 # Import des données
-data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplified.csv", header = TRUE, sep = ";")
+
+data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv", header = TRUE, sep = ";")
 # Visualisation de la base de données
 data %>% head()
 # Statistiques simples des données
@@ -60,21 +61,28 @@ Nous avons choisi de traiter les deux graphiques suivants: boxplot et heatmap, q
 nom <- sort(rep(names(data)[2:29],57)) 
 # On initialise la ligne où seront stockés les valeurs des réserves d'or de tous les pays de l'union européenne
 value <- c(seq(1,1596))
-# On met en ligne les valeurs des réserves d'or de tous les pays de l'union européenne
+# On initialise la ligne où seront stockés les valeurs des moyennes des réserves d'or par pays
+moyenne <-c(seq(1,1596))
+# On met en ligne les valeurs des réserves d'or de tous les pays de l'union européenne et leurs moyennes
 for(i in seq(2,29))
   for(j in seq(1,57))
     value[((i-2)*57+j)] <- data[j,i]
-# On crée le nouveau dataset à partir de nom et value
-data2 <- data.frame(nom, value) 
+# on calcule la moyenne dans une autre double boucle car ainsi les valeurs sont déjà mises en ligne
+for(i in seq(2,29))
+  for(j in seq(1,57))
+    moyenne[((i-2)*57+j)] <- round(mean(value[((i-2)*57):((i-1)*57)]),2)
+# On crée le nouveau dataset à partir de nom, value et moyenne
+data2 <- data.frame(nom, value, moyenne) 
 # On plot le graphique
 p <- qplot(
       x = nom, 
-      y = value, 
+      y = value,
+      z = moyenne,
       data = data2, 
       main = "Boxplot des réserves d'or en tonnes selon les pays de l'UE", 
       xlab = "Nom du pays", 
       ylab = "Quantité d'or en tonnes", 
-      geom = c("boxplot", "jitter")
+      geom = c("boxplot", "jitter","point")
       ) +
     coord_flip() # échange les axes
 ggplotly(p) # le graphique devient interactif
@@ -92,7 +100,7 @@ Ces 21 pays représentent 75% des pays de l'union européenne. Peut-on considér
 ## Heatmap
 
 ### Graphique
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE,out.extra=FALSE}
 # On fait de notre sous-dataset data[,2:29] une matrice.
 # La première colonne sera utilisée pour l'axe des ordonnées
 a <- as.matrix(data[, 2:29]) 

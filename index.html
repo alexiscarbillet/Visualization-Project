@@ -2208,9 +2208,10 @@ library(plotly)</code></pre>
 </div>
 <div id="base-de-donnees" class="section level2">
 <h2>Base de données</h2>
-<p>Dans notre étude, nous avons utilisé une base de données qui se trouve sur <a href="https://www.data.gouv.fr/fr/datasets/reserves-officielles-de-28-pays-europeens">le site data.gouv.fr</a>. Cette base de données représente les réserves d’or de 28 pays européens au cours du temps (du 31 mars 2000 jusqu’au 31 mars 2014) regroupés dans un tableur Excel. Sous chaque pays, se déclinent 4 sous-colonnes : la première correspond aux réserves d’or en tonnes, la seconde colonne la conversion de ces réserves en millions de dollars américains, la troisième sa réserve de change en millions de dollars américains et la dernière le total en dollars américains des deux dernières colonnes. <br> Par la suite, on traitera un dataset simplifié qui ne gardera que la permière sous-colonne de chaque pays, c’est-à-dire sa réserve d’or en tonnes. Il se trouve sous format csv au nom de european-reserves-by-country-simplified.csv au <a href="https://raw.githubusercontent.com/estherjamet/Visualization-Project/master/european-reserves-by-country-simplified.csv">lien suivant</a>.</p>
+<p>Dans notre étude, nous avons utilisé une base de données qui se trouve sur <a href="https://www.data.gouv.fr/fr/datasets/reserves-officielles-de-28-pays-europeens">le site data.gouv.fr</a>. Cette base de données représente les réserves d’or de 28 pays européens au cours du temps (du 31 mars 2000 jusqu’au 31 mars 2014) regroupés dans un tableur Excel. Sous chaque pays, se déclinent 4 sous-colonnes : la première correspond aux réserves d’or en tonnes, la seconde colonne la conversion de ces réserves en millions de dollars américains, la troisième sa réserve de change en millions de dollars américains et la dernière le total en dollars américains des deux dernières colonnes. <br> Par la suite, on traitera un dataset simplifié qui ne gardera que la permière sous-colonne de chaque pays, c’est-à-dire sa réserve d’or en tonnes. Il se trouve sous format csv au nom de european-reserves-by-country-simplified.csv au <a href="https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv">lien suivant</a>.</p>
 <pre class="r"><code># Import des données
-data &lt;- read.table(&quot;https://raw.githubusercontent.com/estherjamet/Visualization-Project/master/european-reserves-by-country-simplified.csv&quot;, header = TRUE, sep = &quot;;&quot;)
+
+data &lt;- read.table(&quot;https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv&quot;, header = TRUE, sep = &quot;;&quot;)
 # Visualisation de la base de données
 data %&gt;% head()</code></pre>
 <pre><code>##     RESERVES Austria Belgium Bulgaria Croatia Cyprus Czech.Republic
@@ -2307,25 +2308,32 @@ summary(data[2:29]) # on n'étudie pas la première colonne, correspondant aux d
 nom &lt;- sort(rep(names(data)[2:29],57)) 
 # On initialise la ligne où seront stockés les valeurs des réserves d'or de tous les pays de l'union européenne
 value &lt;- c(seq(1,1596))
-# On met en ligne les valeurs des réserves d'or de tous les pays de l'union européenne
+# On initialise la ligne où seront stockés les valeurs des moyennes des réserves d'or par pays
+moyenne &lt;-c(seq(1,1596))
+# On met en ligne les valeurs des réserves d'or de tous les pays de l'union européenne et leurs moyennes
 for(i in seq(2,29))
   for(j in seq(1,57))
     value[((i-2)*57+j)] &lt;- data[j,i]
-# On crée le nouveau dataset à partir de nom et value
-data2 &lt;- data.frame(nom, value) 
+# on calcule la moyenne dans une autre double boucle car ainsi les valeurs sont déjà mises en ligne
+for(i in seq(2,29))
+  for(j in seq(1,57))
+    moyenne[((i-2)*57+j)] &lt;- round(mean(value[((i-2)*57):((i-1)*57)]),2)
+# On crée le nouveau dataset à partir de nom, value et moyenne
+data2 &lt;- data.frame(nom, value, moyenne) 
 # On plot le graphique
 p &lt;- qplot(
       x = nom, 
-      y = value, 
+      y = value,
+      z = moyenne,
       data = data2, 
       main = &quot;Boxplot des réserves d'or en tonnes selon les pays de l'UE&quot;, 
       xlab = &quot;Nom du pays&quot;, 
       ylab = &quot;Quantité d'or en tonnes&quot;, 
-      geom = c(&quot;boxplot&quot;, &quot;jitter&quot;)
+      geom = c(&quot;boxplot&quot;, &quot;jitter&quot;,&quot;point&quot;)
       ) +
     coord_flip() # échange les axes
 ggplotly(p) # le graphique devient interactif</code></pre>
-<p>preservedd3e68cf5a1ca6cc</p>
+<p>preserve105bb0c940c1ccd9</p>
 <p>Le boxplot permet de tracer toutes les valeurs statistiques obtenues avec la fonction “summary” auparavant, sauf la moyenne. Cependant, le boxplot ne nous permet pas de connaître les valeurs de chaque donnée d’où le besoin de tracer les nuages de points sur le graphique suivant.</p>
 </div>
 <div id="resultats" class="section level3">
@@ -2348,7 +2356,7 @@ plot_ly(
         colors = brewer.pal(9,&quot;YlOrRd&quot;),
         type = &quot;heatmap&quot;
         )</code></pre>
-<p>preservef4940c8b5e4a4e0e</p>
+<p>preserve916a3e01e2f15fe4</p>
 </div>
 <div id="resultats-1" class="section level3">
 <h3>Résultats</h3>
