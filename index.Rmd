@@ -21,6 +21,7 @@ Il nous a semblé judicieux d'étudier l'évolution des réserves d'or de ces pa
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(rmarkdown)
+library("RColorBrewer")
 library(ggplot2)
 library(plotly)
 ```
@@ -33,7 +34,7 @@ Par la suite, on traitera un dataset simplifié qui ne gardera que la permière 
 
 ```{r}
 # Import des données
-data <- read.table("https://raw.githubusercontent.com/estherjamet/Visualization-Project/master/european-reserves-by-country-simplified.csv", header = TRUE, sep = ";")
+data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplified.csv", header = TRUE, sep = ";")
 # Visualisation de la base de données
 data %>% head()
 # Statistiques simples des données
@@ -100,6 +101,7 @@ plot_ly(
         x = names(data[2:29]), 
         y = data[, 1], 
         z = a, 
+        colors = brewer.pal(9,"YlOrRd"),
         type = "heatmap"
         )
 ```
