@@ -85,7 +85,8 @@ p <- qplot(
       geom = c("boxplot", "jitter","point")
       ) +
     coord_flip() # échange les axes
-ggplotly(p) # le graphique devient interactif
+graph <- ggplotly(p) # le graphique devient interactif
+graph
 ```
 
 Le boxplot permet de tracer toutes les valeurs statistiques obtenues avec la fonction "summary" auparavant, sauf la moyenne.
@@ -105,13 +106,14 @@ Ces 21 pays représentent 75% des pays de l'union européenne. Peut-on considér
 # La première colonne sera utilisée pour l'axe des ordonnées
 a <- as.matrix(data[, 2:29]) 
 # On trace le heatmap avec en abscisses les pays, et en ordonnées les dates de mesure des réserves d'or des différents pays
-plot_ly(
+graph <- plot_ly(
         x = names(data[2:29]), 
         y = data[, 1], 
         z = a, 
         colors = brewer.pal(9,"YlOrRd"),
         type = "heatmap"
         )
+graph
 ```
 
 ### Résultats
