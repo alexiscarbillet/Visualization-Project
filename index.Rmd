@@ -2,7 +2,11 @@
 title: "Visualization Project - European gold reserves"
 author: "Alexis CARBILLET, Benjamin GRONDIN, Esther JAMET"
 date: "12-22/04/2019"
-output: html_document
+output:
+  html_document:
+    toc: TRUE # table of content
+    number_sections: TRUE
+    code_folding: "show"
 ---
 
 
@@ -30,12 +34,11 @@ library(plotly)
 ## Base de données
 Dans notre étude, nous avons utilisé une base de données qui se trouve sur [le site data.gouv.fr](https://www.data.gouv.fr/fr/datasets/reserves-officielles-de-28-pays-europeens). Cette base de données représente les réserves d'or de 28 pays européens au cours du temps (du 31 mars 2000 jusqu'au 31 mars 2014) regroupés dans un tableur Excel. Sous chaque pays, se déclinent 4 sous-colonnes : la première correspond aux réserves d'or en tonnes, la seconde colonne la conversion de ces réserves en millions de dollars américains, la troisième sa réserve de change en millions de dollars américains et la dernière le total en dollars américains des deux dernières colonnes.
 <br>
-Par la suite, on traitera un dataset simplifié qui ne gardera que la permière sous-colonne de chaque pays, c'est-à-dire sa réserve d'or en tonnes. Il se trouve sous format csv au nom de european-reserves-by-country-simplified.csv au [lien suivant](https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv).
+Par la suite, on traitera un dataset simplifié qui ne gardera que la permière sous-colonne de chaque pays, c'est-à-dire sa réserve d'or en tonnes. Il se trouve sous format csv au nom de european-reserves-by-country-simplified.csv au [lien suivant](https://raw.githubusercontent.com/estherjamet/Visualization-Project/master/european-reserves-by-country-simplified.csv).
 
-```{r message=FALSE, warning=FALSE}
+```{r}
 # Import des données
-
-data <- read.table("https://raw.githubusercontent.com/alexiscarbillet/Visualization-Project/master/european-reserves-by-country-simplify.csv", header = TRUE, sep = ";")
+data <- read.table("https://raw.githubusercontent.com/estherjamet/Visualization-Project/master/european-reserves-by-country-simplified.csv", header = TRUE, sep = ";")
 # Visualisation de la base de données
 data %>% head()
 # Statistiques simples des données
@@ -70,8 +73,8 @@ for(i in seq(2,29))
 # on calcule la moyenne dans une autre double boucle car ainsi les valeurs sont déjà mises en ligne
 for(i in seq(2,29))
   for(j in seq(1,57))
-    moyenne[((i-2)*57+j)] <- round(mean(value[((i-2)*57):((i-1)*57)]),2)
-# On crée le nouveau dataset à partir de nom, value et moyenne
+    moyenne[((i-2)*57+j)] <- mean(value[((i-2)*57):((i-1)*57)])
+# On crée le nouveau dataset à partir de nom et value
 data2 <- data.frame(nom, value, moyenne) 
 # On plot le graphique
 p <- qplot(
@@ -85,11 +88,11 @@ p <- qplot(
       geom = c("boxplot", "jitter","point")
       ) +
     coord_flip() # échange les axes
-graph <- ggplotly(p) # le graphique devient interactif
-graph
+ggplotly(p) # le graphique devient interactif
+# la moyenne apparait dans les caractéristiques du point sur lequel se trouve la souris
 ```
 
-Le boxplot permet de tracer toutes les valeurs statistiques obtenues avec la fonction "summary" auparavant, sauf la moyenne.
+Le boxplot permet de tracer toutes les valeurs statistiques obtenues avec la fonction "summary" auparavant, sauf la moyenne. Il est donc nécessaire de la calculer pour chaque pays.
 Cependant, le boxplot ne nous permet pas de connaître les valeurs de chaque donnée d'où le besoin de tracer les nuages de points sur le graphique suivant.
 
 ### Résultats
@@ -101,19 +104,19 @@ Ces 21 pays représentent 75% des pays de l'union européenne. Peut-on considér
 ## Heatmap
 
 ### Graphique
-```{r, warning=FALSE, message=FALSE,out.extra=FALSE}
+```{r, warning=FALSE, message=FALSE}
 # On fait de notre sous-dataset data[,2:29] une matrice.
 # La première colonne sera utilisée pour l'axe des ordonnées
 a <- as.matrix(data[, 2:29]) 
+
 # On trace le heatmap avec en abscisses les pays, et en ordonnées les dates de mesure des réserves d'or des différents pays
-graph <- plot_ly(
+plot_ly(
         x = names(data[2:29]), 
         y = data[, 1], 
         z = a, 
         colors = brewer.pal(9,"YlOrRd"),
         type = "heatmap"
         )
-graph
 ```
 
 ### Résultats
